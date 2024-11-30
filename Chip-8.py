@@ -73,7 +73,7 @@ rkeydict = {
 
 
 def setup():
-    with open("pong.ch8","rb") as file:
+    with open("lunar.ch8","rb") as file:
         raw = file.read()
         data = []
         for i in range(0,len(raw)):
@@ -86,7 +86,7 @@ def setup():
         memory[i] = int("11111111",2)
 
     for i in range(0,32):
-        memory[i+80] = 0   #first 32 bytes used for the stack. 16, 16 bit values storable.
+        memory[i+80] = 0   #first 32 bytes after font used for the stack. 16, 16 bit values storable.
     
     for i in range(0,16):   #Loop that loads font data into the first 80 bytes.
         for j in range(0,5):
@@ -156,6 +156,7 @@ def interpreter(memory):
         if moniter:
             print(ir)
             print(register)
+            print(timer)
 
 
         if ir[0] == "0":        #The code block for handling 0 series instructions.
@@ -473,10 +474,10 @@ def interpreter(memory):
                 reg = int(ir[1],16)
                 timer[1] = register[reg]
 
-            elif ir[2:4] == "1E":
+            elif ir[2:4] == "1e":
                 #This is the ADD I instruction.
                 reg = int(ir[1],16)
-                register[16] = register[16] + register[reg]
+                register[16] += register[reg]
                 if register[16] > 65535:
                     register[16] -= 65536
 
