@@ -73,7 +73,7 @@ rkeydict = {
 
 
 def setup():
-    with open("lunar.ch8","rb") as file:
+    with open("flight.ch8","rb") as file:
         raw = file.read()
         data = []
         for i in range(0,len(raw)):
@@ -174,7 +174,7 @@ def interpreter(memory):
                 
             elif ir[1] == "0" and ir[2] == "e" and ir[3] == "0":
                 #This is the CLS instruction.
-                for i in range(int("70",16),int("70",16)+30):
+                for i in range(int("70",16),int("70",16)+256):
                     memory[i] = 0
 
             else:
