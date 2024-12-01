@@ -188,7 +188,7 @@ usage:
 
         -clk <1/2/3> sets processor clock speed, with 3 being the slowest, 1 being fastest. Default = 2
 
-        -f <file> sets the file you want to run, the default is the included demo.
+        -f <file> sets the file you want to run, the default is the included demo program by David Winter. 
 
     Input is done via a hexidecimal keypad structured like so:
 
@@ -208,6 +208,13 @@ usage:
 
 
 Written by Lily Allenby.
+Licensed under the GNU GPL V3.0 license
+
+Chp-8.py  Copyright (C) 2024 Lily Allenby  
+This program comes with ABSOLUTELY NO WARRANTY
+This is free software, and you are welcome to redistribute it
+under certain conditions.
+
 """)
                 sys.exit()
 
