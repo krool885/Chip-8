@@ -208,12 +208,7 @@ usage:
 
 
 Written by Lily Allenby.
-Licensed under the GNU GPL V3.0 license
-
-Chp-8.py  Copyright (C) 2024 Lily Allenby  
-This program comes with ABSOLUTELY NO WARRANTY
-This is free software, and you are welcome to redistribute it
-under certain conditions.
+Licensed under the MIT license
 
 """)
                 sys.exit()
