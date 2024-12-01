@@ -3,7 +3,7 @@ An interpreter for the Chip-8 platform/language implemented in python with minim
 usage:
     Chip-8.py [-s] [-bc] [-fc] [-m] [-clk] [-f]
 
-    where:
+where:
 
         -s turns sound on, default = off        NOTE: sound only works on windows, do not enable if platform is not windows.
         
