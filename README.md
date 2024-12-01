@@ -1,6 +1,6 @@
 An interpreter for the Chip-8 platform/language implemented in python with minimal dependencies.
 
-The interpreter is ran from the command line and relies on tkinter for the chip-8 display window. Accuracy is pretty good but not perfect especially when it comes to sound, as it seems like all interpreters deal with sound in different ways. The interpreter is released under a GNU license.
+The interpreter is ran from the command line and relies on tkinter for the chip-8 display window. Accuracy is pretty good but not perfect especially when it comes to sound, as it seems like all interpreters deal with sound in different ways. The interpreter is released under the MIT license.
 
 usage:
     
