@@ -2,12 +2,15 @@
 import random
 import time
 import msvcrt as k
-import winsound as s
 import math
 import tkinter as tk
 import threading
 import sys
 import queue
+import platform
+
+if platform.system() == "Windows":
+    import winsound as s
 
 #creating the queue cause we need threading.
 dqueue = queue.Queue(maxsize=5)
@@ -35,12 +38,18 @@ font = [fntZero,fntOne,fntTwo,fntThree,fntFour,fntFive,fntSix,fntSeven,fntEight,
 
 class Vmachine:
     def __init__(self):
-        with open("pong.ch8","rb") as file:
-            raw = file.read()
-            data = []
-            for i in range(0,len(raw)):
-                    data.append(int(raw[i]))
-            #We now have our file as bytes
+        self.cmdargs() #parses the arguments passed via command line
+        
+        try:
+            with open(self.file,"rb") as file:
+                raw = file.read()
+                data = []
+                for i in range(0,len(raw)):
+                        data.append(int(raw[i]))
+                #We now have our file as bytes
+        except FileNotFoundError:
+            print("file not found")
+            sys.exit()
 
         
         tmemory = [0]*4096   #Memory map is simply a big list of integers.
@@ -107,9 +116,100 @@ class Vmachine:
 
         self.cpucycle = 0
         self.stime = math.floor((time.time() % 1)*60)
-        self.moniter = True
         self.snd = 0         # an internal state variable for sound duration.
         self.key = ""
+
+    def cmdargs(self):
+        rawarguments = sys.argv[1:]
+        arguments = []
+        i = 0
+        while i < len(rawarguments):
+            block = []
+            if rawarguments[i][0] == "-":
+                block.append(rawarguments[i].lower())
+                if i != len(rawarguments)-1:
+                    if rawarguments[i+1][0] != "-":
+                        block.append(rawarguments[i+1].lower())
+                        i += 1
+            else:
+                block = rawarguments[i]
+            i += 1
+            arguments.append(block)
+
+        self.sound = False
+        self.bc = "White"
+        self.fc = "Black"
+        self.moniter = False
+        self.clk = 0.010
+        self.file = "demo.ch8"
+        
+        for block in arguments:
+            if block[0] == "-s":
+                self.sound = True
+
+            elif block[0] == "-bc":
+                self.bc = block[1]
+
+            elif block[0] == "-fc":
+                self.fc = block[1]
+
+            elif block[0] == "-m":
+                self.moniter = True
+
+            elif block[0] == "-clk":
+                if block[1] == "1":
+                    self.clk = 0.005
+                elif block[1] == "2":
+                    self.clk = 0.010
+                elif block[1] == "3":
+                    self.clk = 0.020
+                else:
+                    print("invalid clock setting")
+
+            elif block[0] == "-f":
+                self.file = block[1]
+
+            else:
+                print("""
+This is a simple Chip-8 interpreter/VM.
+
+usage:
+    Chip-8.py [-s] [-bc] [-fc] [-m] [-clk] [-f]
+
+    where:
+
+        -s turns sound on, default = off        NOTE: sound only works on windows, do not enable if platform is not windows.
+        
+        -bc [tkinter colour] sets background colour, default = white
+
+        -fc [tkinter colour] sets foreground color, default = black
+
+        -m turns on memory moniter mode for debugging, default = off
+
+        -clk <1/2/3> sets processor clock speed, with 3 being the slowest, 1 being fastest. Default = 2
+
+        -f <file> sets the file you want to run, the default is the included demo.
+
+    Input is done via a hexidecimal keypad structured like so:
+
+        | 1 | 2 | 3 | C |
+        | 4 | 5 | 6 | D |
+        | 7 | 8 | 9 | E |
+        | A | 0 | B | F |
+
+    which is mapped onto the 4x4 grid of keys:
+
+        | 2 | 3 | 4 | 5 |
+        | W | E | R | T |
+        | S | D | F | G |
+        | X | C | V | B |
+
+    Additionally, pressing m during execution will enter moniter mode.
+
+
+Written by Lily Allenby.
+""")
+                sys.exit()
 
     def display(self):
         vram = []   #converts VRAM into a list of binary digits.
@@ -159,7 +259,6 @@ class Vmachine:
             
             if not kqueue.empty():       #The keyrecieve to the window objects keysend
                 msg = kqueue.get_nowait()
-                print(msg)
                 self.key = msg[1]
                 kqueue.task_done()
                 
@@ -537,13 +636,14 @@ class Vmachine:
                     timer[1] = 0
                 
                 if timer[1] != 0:
-                    s.Beep(900,60)
+                    if self.sound == True:  
+                        s.Beep(700,40)
                     
 
             if not self.moniter:
                 self.cpucycle += 1
                 if self.cpucycle == 5:        #Batches instructions in 20s, then waits 0.04 seconds for an effective speed of 500Hz.
-                    time.sleep(0.010)
+                    time.sleep(self.clk)
                     self.cpucycle = 0
                     self.display()
                 if self.key == "m":
@@ -576,22 +676,10 @@ class Vmachine:
             register[18] += 2   #increments program counter.
 
 class Window:
-    def __init__(self):
-        self.dispstr = "a"
-        
-        self.tkwindow = tk.Tk()
-        self.label = tk.Label(self.tkwindow, text="Chip-8")
-        self.label.pack()
-
-        self.disp = tk.Text(self.tkwindow,state="disabled",height = 32, width = 64)
-        self.disp.bind("<Key>", self.keysend)
-        self.disp.pack()
-
-        self.processqueue()
-
-        self.tkwindow.protocol("WM_DELETE_WINDOW", lambda: tk.on_close(self)) #binds the on_close() function to the tkinter window being closed.
-        
-
+    def getcolours(self,bc,fc,file):
+        self.bc = bc
+        self.fc = fc
+        self.file = file
 
     def onclose(self):
         self.tkwindow.destroy()
@@ -621,15 +709,36 @@ class Window:
             self.updatedisplay()
             dqueue.task_done()
         
-        self.disp.after(32, self.processqueue)    #checks queue on a regular interval
+        self.disp.after(20, self.processqueue)    #checks queue on a regular interval
 
     def start(self):
+        self.dispstr = "a"
+        
+        self.tkwindow = tk.Tk()
+        self.tkwindow.title("Chip-8")
+            
+        self.label = tk.Label(self.tkwindow, text=self.file)
+        self.label.pack()
+
+        try:
+            self.disp = tk.Text(self.tkwindow,bg = self.bc, fg = self.fc, state="disabled",height = 32, width = 64)
+        except tk.TclError:
+            print("Invalid tkinter colour, valid examples include: White, Blue, Red, Green")
+            sys.exit()
+            
+        self.disp.bind("<Key>", self.keysend)
+        self.disp.pack()
+
+        self.processqueue()
+
+        self.tkwindow.protocol("WM_DELETE_WINDOW",self.onclose) #binds the on_close() function to the tkinter window being closed.
+        
         tk.mainloop()
     
 def main():
-    
     vm = Vmachine()
     window = Window()   #creating both window and interpreter objects
+    window.getcolours(vm.bc,vm.fc,vm.file)
     
     thread = threading.Thread(target=vm.interpreter, args=(), daemon=True)
     thread.start()  #starting the thread for the interpreter
