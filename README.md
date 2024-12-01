@@ -3,35 +3,35 @@ An interpreter for the Chip-8 platform/language implemented in python with minim
 usage:
     Chip-8.py [-s] [-bc] [-fc] [-m] [-clk] [-f]
 
-where:
+    where:
 
-  -s turns sound on, default = off        NOTE: sound only works on windows, do not enable if platform is not windows.
+        -s turns sound on, default = off        NOTE: sound only works on windows, do not enable if platform is not windows.
         
-  -bc [tkinter colour] sets background colour, default = white
+        -bc [tkinter colour] sets background colour, default = white
 
-  -fc [tkinter colour] sets foreground color, default = black
+        -fc [tkinter colour] sets foreground color, default = black
 
-  -m turns on memory moniter mode for debugging, default = off
+        -m turns on memory moniter mode for debugging, default = off
 
-  -clk <1/2/3> sets processor clock speed, with 3 being the slowest, 1 being fastest. Default = 2
+        -clk <1/2/3> sets processor clock speed, with 3 being the slowest, 1 being fastest. Default = 2
 
-  -f <file> sets the file you want to run, the default is the included demo program by David Winter. 
+        -f <file> sets the file you want to run, the default is the included demo program by David Winter. 
 
-  Input is done via a hexidecimal keypad structured like so:
+Input is done via a hexidecimal keypad structured like so:
 
         | 1 | 2 | 3 | C |
         | 4 | 5 | 6 | D |
         | 7 | 8 | 9 | E |
         | A | 0 | B | F |
 
-  which is mapped onto the 4x4 grid of keys:
+which is mapped onto the 4x4 grid of keys:
 
         | 2 | 3 | 4 | 5 |
         | W | E | R | T |
         | S | D | F | G |
         | X | C | V | B |
 
-  Additionally, pressing m during execution will enter moniter mode.
+Additionally, pressing m during execution will enter moniter mode.
 
 
 Written by Lily Allenby.
